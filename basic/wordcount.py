@@ -38,6 +38,52 @@ print_words() and print_top().
 """
 
 import sys
+import codecs
+
+def print_words(filename):
+    countwords = {}
+    count = 0
+    f = codecs.open(filename, 'rU')
+
+    for s in f:
+        for palavra in s.split():            
+            palavra = palavra.lower()
+            if palavra in countwords:
+                countwords[palavra] +=1
+            else:
+                countwords[palavra] = 1
+    
+    countwords = sorted(countwords.items())    
+
+    for i in countwords:    
+        print i[0], i[1]
+    f.close()
+    return countwords
+
+def valor(countwords):
+    return countwords[1]
+
+def print_top(filename):
+        countwords = {}
+        count = 0
+        f = codecs.open(filename, 'rU')
+
+        for s in f:
+            for palavra in s.split():            
+                palavra = palavra.lower()
+                if palavra in countwords:
+                    countwords[palavra] +=1
+                else:
+                    countwords[palavra] = 1
+        i = 0
+        for key,value in sorted(countwords.items(), key= valor, reverse = True):
+            if i < 20:
+                print key, countwords[key]
+                i+=1
+        f.close()
+    return countwords
+
+
 
 # +++your code here+++
 # Define print_words(filename) and print_top(filename) functions.
