@@ -18,14 +18,31 @@ Here's what a puzzle url looks like:
 10.254.254.28 - - [06/Aug/2007:00:13:48 -0700] "GET /~foo/puzzle-bar-aaab.jpg HTTP/1.0" 302 528 "-" "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6"
 """
 
+def func(url):
+    match = re.search(r'-(\w+)-(\w+)\.\w+', url)
+    if match:
+      return match.group(2)
+    else:
+      return url
 
 def read_urls(filename):
-  """Returns a list of the puzzle urls from the given log file,
-  extracting the hostname from the filename itself.
-  Screens out duplicate urls and returns the urls sorted into
-  increasing order."""
-  # +++your code here+++
-  
+#Returns a list of the puzzle urls from the given log file, extracting the hostname from the filename itself.
+#Screens out duplicate urls and returns the urls sorted into increasing order.
+    
+    underbar = filename.index('_')    
+    hostname = filename[underbar+1:]
+    
+    f = open(filename, 'r')
+    urls = {}
+    for linha in f:
+        match = re.search(r'"GET (\S+)', linha)
+        if match:
+            aux = match.group(1)
+            if 'puzzle' in aux:
+               urls['http://' + hostname + aux] = 1
+    f.close()
+    return sorted(urls.keys(), key = func)
+      
 
 def download_images(img_urls, dest_dir):
   """Given the urls already in the correct order, downloads
@@ -35,7 +52,23 @@ def download_images(img_urls, dest_dir):
   with an img tag to show each local image file.
   Creates the directory if necessary.
   """
-  # +++your code here+++
+  if not os.path.exists(dest_dir):
+    os.makedirs(dest_dir)
+
+  index = file(os.path.join(dest_dir, 'index.html'), 'w')
+  index.write('<html><body>\n')
+
+  i = 0
+  for img in img_urls:
+    nomeimg = 'img%d' % i
+    print 'Retrieving...', img
+    urllib.urlretrieve(img, os.path.join(dest_dir, nomeimg))
+
+    index.write('<img src="%s">' % (nomeimg,))
+    i += 1
+
+  index.write('\n</body></html>\n')
+  index.close()
   
 
 def main():
